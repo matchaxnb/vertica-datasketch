@@ -17,7 +17,6 @@ option(BUILD_TESTS "Build all tests." OFF)
 
 ## When building for Vertica 11, you need to set specific defines
 file(READ "/opt/vertica/sdk/include/BuildInfo.h" buildinfosdk)
-# message(${buildinfosdk})
 string(REGEX MATCH "#define[ ]+VERTICA_BUILD_ID_SDK_Version_Major[ ]+([0-9]+)" _ ${buildinfosdk})
 set(ver_major ${CMAKE_MATCH_1})
 message("Version", ${ver_major})
@@ -43,16 +42,15 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES EP_BASE ${CMAKE_BINARY_DIR}/third_party)
 ExternalProject_Add(
         datasketches
         # Using an URL as you would need a public key for GitHub otherwise.
-        URL https://github.com/apache/incubator-datasketches-cpp/archive/2.1.0-incubating.zip
-        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DBUILD_TESTS=OFF
+        URL https://github.com/apache/incubator-datasketches-cpp/archive/3.1.0.zip
+        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR> -DBUILD_TESTS=OFF -DCMAKE_INCLUDE_PATH=<SOURCE_DIR>/theta/include/
 )
 ExternalProject_Get_Property(datasketches install_dir)
 ExternalProject_Get_Property(datasketches source_dir)
 # Need to include common header which aren't included even though they include *_impl.hpp
 # headers which requires them.
-set(DATASKETCHES_INCLUDE ${install_dir}/include/DataSketches ${source_dir}/common/include)
+set(DATASKETCHES_INCLUDE ${install_dir}/include/DataSketches ${source_dir}/common/include ${source_dir}/theta/include)
 set(DATASKETCHES_LIB_DIR ${install_dir}/lib64)
-
 #####################
 ##  COMPILE FLAGS  ##
 #####################
